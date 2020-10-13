@@ -18,12 +18,68 @@ path = os.getcwd()
 
 os.chdir(path)
 ##################################################################
-
-# A. Properties
-
+# A. HK news
 ##################################################################
-# 1. edigest
+#--- 1. Yahoo News (1)
+driver = webdriver.Chrome()
+driver.get("https://hk.news.yahoo.com/hong-kong")
+time.sleep(5)
 
+info_path = driver.find_elements_by_xpath("//*[@id='YDC-Stream']/ul/li/div/div/div/h3/a")
+
+info = [i.text for i in info_path]
+
+#info = list(filter(None, info))
+
+link_path = driver.find_elements_by_xpath("//*[@id='YDC-Stream']/ul/li/div/div/div/h3/a")
+
+link = [i.get_attribute("href") for i in link_path]
+
+hknews1 = DataFrame([info, link]).transpose()
+
+hknews1[2] = 'Yahoo'
+
+driver.close()
+
+#--- 2. Now News
+driver = webdriver.Chrome()
+driver.get("https://news.now.com/home/local")
+time.sleep(5)
+
+info_path = driver.find_elements_by_class_name('newsLeading')
+info = [i.text for i in info_path]
+
+link_path = driver.find_elements_by_tag_name('a')
+# iterate link_path -> if link contains 
+link = [i.get_attribute("href") for i in link_path if(("local" in i.get_attribute("href")) and ("newsId=" in i.get_attribute("href")))]
+
+hknews2 = DataFrame([info, link]).transpose()
+
+hknews2[2] = 'Now news'
+
+driver.close()
+
+#-- 3. Apple Daily
+driver = webdriver.Chrome()
+driver.get("https://hk.appledaily.com/realtime/breaking/")
+time.sleep(5)
+
+info_path = driver.find_elements_by_xpath("//span[contains(@class, 'desktop') and contains(@class, 'blurb')]")
+info = [i.text for i in info_path]
+
+link_path = driver.find_elements_by_xpath("//a[contains(@class, 'story-card')]")
+# iterate link_path -> if link contains 
+link = [i.get_attribute("href") for i in link_path]
+
+hknews3 = DataFrame([info, link]).transpose()
+
+hknews3[2] = 'Apple Daily'
+
+driver.close()
+##################################################################
+# B. Properties
+##################################################################
+#--- 1. edigest
 driver = webdriver.Chrome()
 
 driver.get("https://www.edigest.hk/category/%e6%a8%93%e5%b8%82/")
@@ -43,9 +99,11 @@ link = [i.get_attribute("href") for i in link_path]
 
 Property1 = DataFrame([info, link]).transpose()
 
+Property1[2] = 'E digest'
+
 driver.close()
 
-# 2. Yahoo
+#--- 2. Yahoo
 
 driver = webdriver.Chrome()
 
@@ -64,14 +122,14 @@ link_path = driver.find_elements_by_xpath("//*[@id='YDC-Stream']/ul/li/div/div/d
 link = [i.get_attribute("href") for i in link_path]
 
 Property2 = DataFrame([info, link]).transpose()
+
+Property2[2] = 'Yahoo'
+
 driver.close()
-
 ##################################################################
-
-# B. Investments
-
+# C. Investments
 ##################################################################
-# 1. edigest
+#--- 1. edigest
 
 driver = webdriver.Chrome()
 
@@ -91,10 +149,11 @@ link = [i.get_attribute("href") for i in link_path]
 
 Investment1 = DataFrame([info, link]).transpose() 
 
+Investment1[2] = 'E digest'
+
 driver.close()
 
-# 2. Yahoo
-
+#--- 2. Yahoo
 driver = webdriver.Chrome()
 
 driver.get("https://hk.news.yahoo.com/business")
@@ -113,32 +172,13 @@ link = [i.get_attribute("href") for i in link_path]
 
 Investment2 = DataFrame([info, link]).transpose()
 
-driver.close()
-##################################################################
-# C. HK news
-##################################################################
-# 1. Yahoo News (1)
-driver = webdriver.Chrome()
-driver.get("https://hk.news.yahoo.com/hong-kong")
-time.sleep(5)
-
-info_path = driver.find_elements_by_xpath("//*[@id='YDC-Stream']/ul/li/div/div/div/h3/a")
-
-info = [i.text for i in info_path]
-
-#info = list(filter(None, info))
-
-link_path = driver.find_elements_by_xpath("//*[@id='YDC-Stream']/ul/li/div/div/div/h3/a")
-
-link = [i.get_attribute("href") for i in link_path]
-
-hknews1 = DataFrame([info, link]).transpose()
+Investment2[2] = 'Yahoo'
 
 driver.close()
 
-# 2. Now News
+#--- 3. Now News
 driver = webdriver.Chrome()
-driver.get("https://news.now.com/home/local")
+driver.get("https://news.now.com/home/finance")
 time.sleep(5)
 
 info_path = driver.find_elements_by_class_name('newsLeading')
@@ -146,60 +186,36 @@ info = [i.text for i in info_path]
 
 link_path = driver.find_elements_by_tag_name('a')
 # iterate link_path -> if link contains 
-link = [i.get_attribute("href") for i in link_path if(("local" in i.get_attribute("href")) and ("newsId=" in i.get_attribute("href")))]
+link = [i.get_attribute("href") for i in link_path if(("finance" in i.get_attribute("href")) and ("newsId=" in i.get_attribute("href")))]
 
-hknews2 = DataFrame([info, link]).transpose()
+Investment3 = DataFrame([info, link]).transpose()
 
-driver.close()
-##################################################################
-# D. Insurance
-##################################################################
-# 1. edigest Insurance (1)
-
-driver = webdriver.Chrome()
-
-driver.get("https://www.edigest.hk/category/%e7%90%86%e8%b2%a1/%e4%bf%9d%e9%9a%aa/")
-
-time.sleep(5)
-
-info_path = driver.find_elements_by_xpath("//*[@id='main']/div/div/div/div/div/article/div/a/div/h3")
-
-info = [i.text for i in info_path]
-
-#info = list(filter(None, info))
-
-link_path = driver.find_elements_by_xpath("//*[@id='main']/div/div/div/div/div/article/div/a")
-
-link = [i.get_attribute("href") for i in link_path]
-
-Insurance1 = DataFrame([info, link]).transpose()
+Investment3[2] = 'Now news'
 
 driver.close()
+
+
 ##################################################################
 # Add labels
 ##################################################################
-Investment = pd.concat([Investment1, Investment2])
-Investment[2] = 'Investment'
+hknews = pd.concat([hknews1, hknews2, hknews3])
+hknews[3] = 'HK news'
+
+Investment = pd.concat([Investment1, Investment2, Investment3])
+Investment[3] = 'Investment'
 
 Property = pd.concat([Property1, Property2])
-Property[2] = 'Property'
-
-hknews = pd.concat([hknews1, hknews2])
-hknews[2] = 'HK news'
+Property[3] = 'Property'
 ##################################################################
-
 # aggregate the extracted information - and make the link work
-
 ##################################################################
 summary_file = pd.concat([Investment, Property, hknews])
 # make the link work
 summary_file[1] = '=hyperlink("' + summary_file[1] + '")'
 ##################################################################
-
 # rearrange column order
-
 ##################################################################
-summary_file = summary_file[[2, 0, 1]]
+summary_file = summary_file[[3, 2, 0, 1]]
 
 #summary_file.to_excel("summary_file.xlsx", sheet_name = "summary_file")
 
